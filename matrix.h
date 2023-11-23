@@ -18,6 +18,7 @@ Matrix multiplyMatrices(Matrix mat1, Matrix mat2);
 double determinant(Matrix mat);
 Matrix transpose(Matrix mat);
 Matrix createMatrix(int rows, int cols);
+int matrixRank(Matrix mat) {
 
 
 #endif

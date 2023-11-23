@@ -180,3 +180,114 @@ Matrix createMatrix(int rows, int cols) {
 
     return mat;
 }
+
+// Funkce pro výměnu dvou řádků matice
+void swapRows(Matrix *mat, int row1, int row2) {
+    for (int j = 0; j < mat->cols; j++) {
+        double temp = mat->data[row1][j];
+        mat->data[row1][j] = mat->data[row2][j];
+        mat->data[row2][j] = temp;
+    }
+}
+
+// Funkce pro nalezení nenulového prvku v daném sloupci a pod ním
+int findNonZeroElement(Matrix mat, int col, int startRow) {
+    for (int i = startRow; i < mat.rows; i++) {
+        if (mat.data[i][col] != 0.0) {
+            return i;
+        }
+    }
+    return -1; // Nenalezen žádný nenulový prvek
+}
+
+// Funkce pro normalizaci řádku (převedení prvního prvku na 1 a následné odčítání od ostatních řádků)
+void normalizeRow(Matrix *mat, int row, double factor) {
+    for (int j = 0; j < mat->cols; j++) {
+        mat->data[row][j] /= factor;
+    }
+}
+
+// Funkce pro odčítání násobku jednoho řádku od jiného řádku
+void subtractRows(Matrix *mat, int row1, int row2, double factor) {
+    for (int j = 0; j < mat->cols; j++) {
+        mat->data[row2][j] -= factor * mat->data[row1][j];
+    }
+}
+
+// Funkce pro určení hodnosti matice
+int matrixRank(Matrix mat) {
+    int rank = 0;
+    Matrix copy = mat;
+
+    for (int i = 0; i < copy.rows; i++) {
+        // Nalezni nenulový prvek ve sloupci i a řádku i nebo vyšší
+        int nonZeroRow = findNonZeroElement(copy, i, i);
+
+        if (nonZeroRow != -1) {
+            // Pokud je nalezen nenulový prvek, zvýši se hodnost matice
+            rank++;
+
+            // Převedení prvního prvku na 1
+            double pivot = copy.data[nonZeroRow][i];
+            normalizeRow(&copy, nonZeroRow, pivot);
+
+            // Odčítání násobků řádků tak, aby byly nuly pod pivotem
+            for (int j = nonZeroRow + 1; j < copy.rows; j++) {
+                double factor = copy.data[j][i];
+                subtractRows(&copy, nonZeroRow, j, factor);
+            }
+        }
+    }
+
+    return rank;
+}
+
+// Funkce pro výpočet inverzní matice pomocí Gaussovy eliminační metody
+Matrix inverseMatrix(Matrix mat) {
+    if (mat.rows != mat.cols) {
+        printf("Inverzní matice může být vypočítána pouze pro čtvercovou matici.\n");
+        exit(1);
+    }
+
+    int n = mat.rows;
+    Matrix augmentedMat = createMatrix(n, 2 * n);
+
+    // Inicializace augmentované matice [mat | I], kde I je jednotková matice
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            augmentedMat.data[i][j] = mat.data[i][j];
+            augmentedMat.data[i][j + n] = (i == j) ? 1.0 : 0.0;
+        }
+    }
+
+    // Gaussova eliminace
+    for (int i = 0; i < n; i++) {
+        int nonZeroRow = findNonZeroElement(augmentedMat, i, i);
+
+        if (nonZeroRow == -1) {
+            printf("Matice není invertovatelná.\n");
+            exit(1);
+        }
+
+        swapRows(&augmentedMat, i, nonZeroRow);
+        double pivot = augmentedMat.data[i][i];
+        normalizeRow(&augmentedMat, i, pivot);
+
+        for (int j = 0; j < n; j++) {
+            if (i != j) {
+                double factor = augmentedMat.data[j][i];
+                subtractRows(&augmentedMat, i, j, factor);
+            }
+        }
+    }
+
+    // Vytvoření inverzní matice z pravé poloviny augmentované matice
+    Matrix invMat = createMatrix(n, n);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            invMat.data[i][j] = augmentedMat.data[i][j + n];
+        }
+    }
+
+    return invMat;
+}

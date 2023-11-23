@@ -19,6 +19,8 @@ int main() {
         printf("4. Násobení matic\n");
         printf("5. Determinant matice\n");
         printf("6. Transpozice matice\n");
+        printf("7. Určení hodnosti matice\n");
+        printf("8. Výpočet inverzní matice\n");
 
         scanf("%d", &choice);
 
@@ -63,12 +65,24 @@ int main() {
                 result = transpose(mat1);
                 break;
 
+            case 7:
+                mat1 = loadMatrix("matrix1.txt");
+                int rank = matrixRank(mat1);
+                result = createMatrix(1, 1);
+                result.data[0][0] = (double)rank;
+                break;
+
+            case 8:
+                mat1 = loadMatrix("matrix1.txt");
+                result = inverseMatrix(mat1);
+                break;
+
             default:
                 printf("Neplatná volba.\n");
                 return 1;
         }
 
-        char operationNames[][20] = {"Sčítání", "Odečítání", "Násobení skalárem", "Násobení", "Determinant", "Transpozice"};
+        char operationNames[][20] = {"Sčítání", "Odečítání", "Násobení skalárem", "Násobení", "Determinant", "Transpozice", "Určení hodnosti", "Inverze"};
         appendHistory("history.txt", result, operationNames[choice - 1], timestamp, calculationNumber);
         printf("Výsledek byl uložen do souboru history.txt.\n");
 
@@ -95,32 +109,16 @@ void appendHistory(const char *filename, Matrix mat, const char *operation, time
     }
 
     fprintf(file, "Výpočet %d proběhl v %s", calculationNumber, asctime(localtime(&timestamp)));
+    fprintf(file, "Operace: %s\n", operation);
 
-    // Přidání operace, pokud není násobení skalárem
-    if (strcmp(operation, "Násobení skalárem") == 0) {
-        fprintf(file, "Operace: Násobení skalárem\n");
-        if (mat.rows > 0 && mat.cols > 0) {
-            fprintf(file, "%.2lf\n", mat.data[0][0]);
-        }
-    } else if (strcmp(operation, "Násobení") == 0) {
-        fprintf(file, "Operace: Násobení\n");
-        if (mat.rows > 0 && mat.cols > 0) {
-            for (int i = 0; i < mat.rows; i++) {
-                for (int j = 0; j < mat.cols; j++) {
-                    fprintf(file, "%.2lf ", mat.data[i][j]);
-                }
-                fprintf(file, "\n");
-            }
-        }
+    if (strcmp(operation, "Determinant") == 0 || strcmp(operation, "Určení hodnosti") == 0 || strcmp(operation, "Inverze") == 0) {
+        fprintf(file, "%.2lf\n", mat.data[0][0]);
     } else {
-        fprintf(file, "Operace: %s\n", operation);
-        if (mat.rows > 0 && mat.cols > 0) {
-            for (int i = 0; i < mat.rows; i++) {
-                for (int j = 0; j < mat.cols; j++) {
-                    fprintf(file, "%.2lf ", mat.data[i][j]);
-                }
-                fprintf(file, "\n");
+        for (int i = 0; i < mat.rows; i++) {
+            for (int j = 0; j < mat.cols; j++) {
+                fprintf(file, "%.2lf ", mat.data[i][j]);
             }
+            fprintf(file, "\n");
         }
     }
 
