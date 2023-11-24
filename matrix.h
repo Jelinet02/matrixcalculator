@@ -10,15 +10,25 @@ typedef struct {
 } Matrix;
 
 Matrix loadMatrix(const char *filename);
+
 void saveMatrix(const char *filename, Matrix mat, const char *operation);
+
 Matrix addMatrices(Matrix mat1, Matrix mat2);
+
 Matrix subtractMatrices(Matrix mat1, Matrix mat2);
+
 Matrix multiplyByScalar(Matrix mat, int scalar);
+
 Matrix multiplyMatrices(Matrix mat1, Matrix mat2);
+
 double determinant(Matrix mat);
+
 Matrix transpose(Matrix mat);
+
 Matrix createMatrix(int rows, int cols);
-int matrixRank(Matrix mat) {
 
+Matrix inverseMatrix(Matrix mat);
 
-#endif
+int matrixRank(Matrix mat);
+
+#endif  // MATRIX_H
