@@ -6,69 +6,74 @@
 
 void appendHistory(const char *filename, Matrix mat, const char *operation, time_t timestamp, int calculationNumber);
 
+void printMenu() {
+    printf("Vyberte operaci (1-6) nebo 0 pro ukončení:\n");
+    printf("1. Sčítání matic\n");
+    printf("2. Odečítání matic\n");
+    printf("3. Násobení matice skalárem\n");
+    printf("4. Násobení matic\n");
+    printf("5. Determinant matice\n");
+    printf("6. Transpozice matice\n");
+}
+
 int main() {
     int choice;
     Matrix mat1, mat2, result;
     int calculationNumber = 1;
 
     do {
-        printf("Vyberte operaci:\n");
-        printf("1. Sčítání matic\n");
-        printf("2. Odečítání matic\n");
-        printf("3. Násobení matice skalárem\n");
-        printf("4. Násobení matic\n");
-        printf("5. Determinant matice\n");
-        printf("6. Transpozice matice\n");
-
+        printMenu();
         scanf("%d", &choice);
+
+        if (choice == 0) {
+            break;
+        }
 
         time_t timestamp = time(NULL);
 
+        mat1 = loadMatrix("matrix1.txt");
+
         switch (choice) {
             case 1:
-                mat1 = loadMatrix("matrix1.txt");
-                mat2 = loadMatrix("matrix2.txt");
-                result = addMatrices(mat1, mat2);
-                break;
-
             case 2:
-                mat1 = loadMatrix("matrix1.txt");
+            case 4:
+            case 6:
                 mat2 = loadMatrix("matrix2.txt");
-                result = subtractMatrices(mat1, mat2);
                 break;
-
             case 3:
-                mat1 = loadMatrix("matrix1.txt");
+            {
                 int scalar;
                 printf("Zadejte skalár: ");
                 scanf("%d", &scalar);
                 result = multiplyByScalar(mat1, scalar);
                 break;
-
-            case 4:
-                mat1 = loadMatrix("matrix1.txt");
-                mat2 = loadMatrix("matrix2.txt");
-                result = multiplyMatrices(mat1, mat2);
-                break;
-
+            }
             case 5:
-                mat1 = loadMatrix("matrix1.txt");
-                double det = determinant(mat1);
                 result = createMatrix(1, 1);
-                result.data[0][0] = det;
+                result.data[0][0] = determinant(mat1);
                 break;
-
-            case 6:
-                mat1 = loadMatrix("matrix1.txt");
-                result = transpose(mat1);
-                break;
-
             default:
                 printf("Neplatná volba.\n");
                 return 1;
         }
 
         char operationNames[][20] = {"Sčítání", "Odečítání", "Násobení skalárem", "Násobení", "Determinant", "Transpozice"};
+
+        switch (choice) {
+            case 1:
+                result = addMatrices(mat1, mat2);
+                break;
+            case 2:
+                result = subtractMatrices(mat1, mat2);
+                break;
+            case 4:
+                result = multiplyMatrices(mat1, mat2);
+                break;
+            case 6:
+                result = transpose(mat1);
+                break;
+        }
+
         appendHistory("history.txt", result, operationNames[choice - 1], timestamp, calculationNumber);
         printf("Výsledek byl uložen do souboru history.txt.\n");
 
@@ -79,10 +84,6 @@ int main() {
 
     } while (choice == 1);
 
-    // Po ukončení programu vymažeme historii
-    FILE *historyFile = fopen("history.txt", "w");
-    fclose(historyFile);
-
     return 0;
 }
 
@@ -91,36 +92,19 @@ void appendHistory(const char *filename, Matrix mat, const char *operation, time
 
     if (file == NULL) {
         printf("Chyba při otevírání souboru %s.\n", filename);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     fprintf(file, "Výpočet %d proběhl v %s", calculationNumber, asctime(localtime(&timestamp)));
 
-    // Přidání operace, pokud není násobení skalárem
-    if (strcmp(operation, "Násobení skalárem") == 0) {
-        fprintf(file, "Operace: Násobení skalárem\n");
-        if (mat.rows > 0 && mat.cols > 0) {
-            fprintf(file, "%.2lf\n", mat.data[0][0]);
-        }
-    } else if (strcmp(operation, "Násobení") == 0) {
-        fprintf(file, "Operace: Násobení\n");
-        if (mat.rows > 0 && mat.cols > 0) {
-            for (int i = 0; i < mat.rows; i++) {
-                for (int j = 0; j < mat.cols; j++) {
-                    fprintf(file, "%.2lf ", mat.data[i][j]);
-                }
-                fprintf(file, "\n");
+    fprintf(file, "Operace: %s\n", operation);
+
+    if (mat.rows > 0 && mat.cols > 0) {
+        for (int i = 0; i < mat.rows; i++) {
+            for (int j = 0; j < mat.cols; j++) {
+                fprintf(file, "%.2lf ", mat.data[i][j]);
             }
-        }
-    } else {
-        fprintf(file, "Operace: %s\n", operation);
-        if (mat.rows > 0 && mat.cols > 0) {
-            for (int i = 0; i < mat.rows; i++) {
-                for (int j = 0; j < mat.cols; j++) {
-                    fprintf(file, "%.2lf ", mat.data[i][j]);
-                }
-                fprintf(file, "\n");
-            }
+            fprintf(file, "\n");
         }
     }
 
