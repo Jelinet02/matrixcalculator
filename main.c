@@ -57,7 +57,7 @@ int main() {
                 return 1;
         }
 
-        char operationNames[][20] = {"Sčítání", "Odečítání", "Násobení skalárem", "Násobení", "Determinant", "Transpozice"};
+        char* operationNames[][20] = {"Sčítání", "Odečítání", "Násobení skalárem", "Násobení", "Determinant", "Transpozice"};
 
         switch (choice) {
             case 1:
@@ -108,7 +108,7 @@ void appendHistory(const char *filename, Matrix mat, const char *operation, time
         }
     }
 
-    fprintf(file, "-----------------\n");  // Čára mezi výsledky
+    fprintf(file, "-----------------\n");
 
     fclose(file);
 }
