@@ -1,20 +1,10 @@
 #include "matrix.h"
 #include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
-void appendHistory(const char *filename, Matrix mat, const char *operation, time_t timestamp, int calculationNumber);
 
-void printMenu() {
-    printf("Vyberte operaci (1-6) nebo 0 pro ukončení:\n");
-    printf("1. Sčítání matic\n");
-    printf("2. Odečítání matic\n");
-    printf("3. Násobení matice skalárem\n");
-    printf("4. Násobení matic\n");
-    printf("5. Determinant matice\n");
-    printf("6. Transpozice matice\n");
-}
 
 int main() {
     int choice;
@@ -28,7 +18,6 @@ int main() {
         if (choice == 0) {
             break;
         }
-
         time_t timestamp = time(NULL);
 
         mat1 = loadMatrix("matrix1.txt");
@@ -43,7 +32,7 @@ int main() {
             case 3:
             {
                 int scalar;
-                printf("Zadejte skalár: ");
+                printf("Zadejte skalar: ");
                 scanf("%d", &scalar);
                 result = multiplyByScalar(mat1, scalar);
                 break;
@@ -52,12 +41,15 @@ int main() {
                 result = createMatrix(1, 1);
                 result.data[0][0] = determinant(mat1);
                 break;
+
+
             default:
-                printf("Neplatná volba.\n");
+                printf("Neplatna volba.\n");
                 return 1;
         }
 
-        char* operationNames[][20] = {"Sčítání", "Odečítání", "Násobení skalárem", "Násobení", "Determinant", "Transpozice"};
+
+        char* operationNames[] = {"Soucet", "Rozdil", "Skalarni soucin", "Soucin", "Determinant", "Transpozice"};
 
         switch (choice) {
             case 1:
@@ -74,41 +66,18 @@ int main() {
                 break;
         }
 
-        appendHistory("history.txt", result, operationNames[choice - 1], timestamp, calculationNumber);
-        printf("Výsledek byl uložen do souboru history.txt.\n");
+            appendHistory("history.txt", result, operationNames[choice - 1], timestamp, calculationNumber);
+            printf("Vysledek ulozen do history.txt.\n");
 
-        printf("Chcete provést další výpočet? (1 pro ano, 0 pro ne): ");
-        scanf("%d", &choice);
+            printf("Prejete si pokracovat? (1 pro ano, 0 pro ne): ");
+            scanf("%d", &choice);
 
-        calculationNumber++;
+            calculationNumber++;
+
+
 
     } while (choice == 1);
 
     return 0;
 }
 
-void appendHistory(const char *filename, Matrix mat, const char *operation, time_t timestamp, int calculationNumber) {
-    FILE *file = fopen(filename, "a");
-
-    if (file == NULL) {
-        printf("Chyba při otevírání souboru %s.\n", filename);
-        exit(EXIT_FAILURE);
-    }
-
-    fprintf(file, "Výpočet %d proběhl v %s", calculationNumber, asctime(localtime(&timestamp)));
-
-    fprintf(file, "Operace: %s\n", operation);
-
-    if (mat.rows > 0 && mat.cols > 0) {
-        for (int i = 0; i < mat.rows; i++) {
-            for (int j = 0; j < mat.cols; j++) {
-                fprintf(file, "%.2lf ", mat.data[i][j]);
-            }
-            fprintf(file, "\n");
-        }
-    }
-
-    fprintf(file, "-----------------\n");
-
-    fclose(file);
-}

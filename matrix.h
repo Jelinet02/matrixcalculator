@@ -1,7 +1,7 @@
 #ifndef MATRIX_H
 #define MATRIX_H
-
-#define MAX_SIZE 5
+#define MAX_SIZE 7
+#include <time.h>
 
 typedef struct {
     int rows;
@@ -30,5 +30,9 @@ Matrix createMatrix(int rows, int cols);
 Matrix inverseMatrix(Matrix mat);
 
 int matrixRank(Matrix mat);
+
+void appendHistory(const char *filename, Matrix mat, const char *operation, time_t timestamp, int calculationNumber);
+
+void printMenu();
 
 #endif  // MATRIX_H
