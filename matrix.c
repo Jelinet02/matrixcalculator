@@ -77,26 +77,6 @@ Matrix loadMatrix(const char *projectDir, const char *filename) {
     return mat;
 }
 
-void saveMatrix(const char *filename, Matrix mat, const char *operation) {
-    FILE *file = fopen(filename, "w");
-
-    if (file == NULL) {
-        printf("Chyba pri otevirani souboru %s.\n", filename);
-        exit(1);
-    }
-
-    fprintf(file, "%d %d\n", mat.rows, mat.cols);
-    fprintf(file, "Operace: %s\n", operation);
-
-    for (int i = 0; i < mat.rows; i++) {
-        for (int j = 0; j < mat.cols; j++) {
-            fprintf(file, "%.2lf ", mat.data[i][j]);
-        }
-        fprintf(file, "\n");
-    }
-
-    fclose(file);
-}
 
 Matrix addMatrices(Matrix mat1, Matrix mat2) {
     Matrix result;
