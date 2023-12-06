@@ -9,7 +9,7 @@ typedef struct {
     double data[MAX_SIZE][MAX_SIZE];
 } Matrix;
 
-Matrix loadMatrix(const char *filename);
+Matrix loadMatrix(const char *projectDir, const char *filename);
 
 void saveMatrix(const char *filename, Matrix mat, const char *operation);
 

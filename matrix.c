@@ -39,14 +39,12 @@ void appendHistory(const char *filename, Matrix mat, const char *operation, time
     fclose(file);
 }
 
-Matrix loadMatrix(const char *filename) {
-    const char *projectDir = "/Users/jelinet02/Downloads/matrixcalculator-main/cmake-build-debug";
-
+Matrix loadMatrix(const char *projectDir, const char *filename) {
     char fullPath[PATH_MAX];
     snprintf(fullPath, sizeof(fullPath), "%s/%s", projectDir, filename);
     printf("Oteviram soubor: %s\n", fullPath);
     Matrix mat;
-    FILE *file = fopen(filename, "r");
+    FILE *file = fopen(fullPath, "r");
 
     if (file == NULL) {
         perror("Soubor nelze otevrit");
